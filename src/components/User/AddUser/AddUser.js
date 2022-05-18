@@ -8,11 +8,22 @@ const AddUser = props => {
 
     const [enteredUsername, setEnteredUsername] = useState('')
     const [userAge, setUserAge] = useState('')
+    const [isError, setIsError] = useState();
 
     const addUserHandler = (event) => {
         event.preventDefault();
-        if(enteredUsername.trim().length === 0 || userAge.trim().length === 0 || +userAge < 1) {
-
+        if(enteredUsername.trim().length === 0 || userAge.trim().length === 0) {
+            setIsError({
+                title: 'Invalid input',
+                message: 'Please enter a valid name and age (non-empty input)'
+            })
+            return;
+        } if (+userAge < 1) {
+            setIsError({
+                title: 'Invalid age',
+                message: 'Please enter a valid age (> 0)'
+            })
+            return
         } else {
             props.onAddUser(enteredUsername, userAge)
             setEnteredUsername('');
@@ -28,16 +39,24 @@ const AddUser = props => {
       setUserAge(event.target.value)
     }
 
+    const modalRemoveHandler = () => {
+        setIsError(null)
+    }
+
     return (
         <div>
-            <ErrorModal title={'An Error'} message={'Invalid input!'}/>
+            {isError && <ErrorModal
+                title={isError.title}
+                message={isError.message}
+                onModalRemove={modalRemoveHandler}
+            />}
             <Card className={styles.input}>
-                <form onClick={addUserHandler}>
+                <form>
                     <label htmlFor="username">User name</label>
                     <input id="username" type="text" value={enteredUsername} onChange={usernameChangeHandler}/>
                     <label htmlFor="age">Age (years)</label>
                     <input id="age" type="number" value={userAge} onChange={ageChangeHandler}/>
-                    <Button>Add user</Button>
+                    <Button onClick={addUserHandler}>Add user</Button>
                 </form>
             </Card>
         </div>
